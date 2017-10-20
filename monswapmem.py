@@ -1,4 +1,7 @@
 #!/usr/bin/python
+"""
+Script to monitor and report on Linux SWAP memory.
+"""
 
 import fnmatch
 import pwd
@@ -6,10 +9,14 @@ from os import listdir
 from optparse import OptionParser
 
 parser = OptionParser()
-parser.add_option("-u", "--userswp", action="store_true", dest="userswp", default=False, help="Print Per User Swap Usage [default: %default]")
-parser.add_option("-t", "--total", action="store_true", dest="swptotal", default=False, help="Display Total Swap Usage Summary [default: %default]")
-parser.add_option("-p", "--processwp", action="store_true", dest="processwp", default=False, help="Display per Process Swap Usage [default: %default]")
-parser.add_option("-P", "--ppidswp", action="store_true", dest="ppidswp", default=False, help="Display per Perrant Process Swap Usage [default: %default]")
+parser.add_option("-u", "--userswp", action="store_true", dest="userswp",
+                  default=False, help="Print Per User Swap Usage [default: %default]")
+parser.add_option("-t", "--total", action="store_true", dest="swptotal",
+                  default=False, help="Display Total Swap Usage Summary [default: %default]")
+parser.add_option("-p", "--processwp", action="store_true", dest="processwp",
+                  default=False, help="Display per Process Swap Usage [default: %default]")
+parser.add_option("-P", "--ppidswp", action="store_true", dest="ppidswp",
+                  default=False, help="Display per Perrant Process Swap Usage [default: %default]")
 (options, args) = parser.parse_args()
 
 
@@ -42,7 +49,10 @@ for dirr in siddir:
                     except:
                         ppidswp[str("ppid" + lines1.split()[1])] = prcswp
             if options.processwp:
-                print dirr.ljust(8) + " : " + (str(prcswp) + " KB").ljust(16) + " :  CMD: " + firstLine
+                print str(dirr.ljust(8) + " : " +
+                          (str(prcswp) + " KB").ljust(16) +
+                          " :  CMD: " + firstLine
+                         )
             tswpsz += prcswp
 
 if options.processwp:
@@ -53,20 +63,26 @@ if options.userswp:
     print str("User: ").ljust(16) + str("Uid: ").ljust(12) + str("Usage: KB").rjust(12)
     for uiidd in uidswp:
         if uiidd != 'key':
-            print pwd.getpwuid(int(uiidd.replace('uid','')))[0].ljust(16) + str(uiidd.replace('uid', '')).ljust(12) + str(uidswp[uiidd]).rjust(12)
+            print str(
+                pwd.getpwuid(int(uiidd.replace('uid', '')))[0].ljust(16) +
+                str(uiidd.replace('uid', '')).ljust(12) +
+                str(uidswp[uiidd]).rjust(12)
+                )
     print "\n"
 
 if options.ppidswp:
     print str("App:").ljust(16) + str("Ppid:").ljust(12) + str("Usage: KB").rjust(12)
     for ppidd in ppidswp:
         if ppidd != 'key':
-            infile2 = open("/proc/" + ppidd.replace('ppid','') + "/comm", 'r')
+            infile2 = open("/proc/" + ppidd.replace('ppid', '') + "/comm", 'r')
             firstLine2 = infile2.readline()
-            print firstLine2.replace('\n', ' ').replace('\r', '').strip().ljust(16) + str(ppidd.replace('ppid','').ljust(12)) + str(ppidswp[ppidd]).rjust(12)
+            print str(
+                firstLine2.replace('\n', ' ').replace('\r', '').strip().ljust(16) +
+                str(ppidd.replace('ppid', '').ljust(12)) +
+                str(ppidswp[ppidd]).rjust(12)
+                )
     print "\n"
 
 if options.swptotal:
     print "Total: " + str(tswpsz) + " KB"
     print "\n"
-
-
